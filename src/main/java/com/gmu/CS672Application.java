@@ -8,7 +8,9 @@ import com.gmu.db.PersonSqlDAO;
 import com.gmu.db.PersonCouchbaseDAO;
 import com.gmu.db.PersonDAO;
 import com.gmu.db.PersonFileReader;
+import com.gmu.resources.PersonCouchbaseResource;
 import com.gmu.resources.PersonResource;
+import com.gmu.resources.PersonSqlResource;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -34,7 +36,7 @@ public class CS672Application extends Application<CS672Configuration> {
     @Override
     public void run(final CS672Configuration configuration,
                     final Environment environment) {
-    	PersonDAO sharedSqlDao = new PersonSqlDAO();
+    	PersonSqlDAO sharedSqlDao = new PersonSqlDAO();
     	sharedSqlDao.initializeConnection();
         sharedSqlDao.clearAndCreateDatabase();
         
@@ -43,13 +45,13 @@ public class CS672Application extends Application<CS672Configuration> {
         sharedCouchbaseDao.clearAndCreateDatabase();
         
         PersonFileReader fileReader = new PersonFileReader(sharedSqlDao, sharedCouchbaseDao);
-    	fileReader.readPeopleFromFile("src/main/resources/assets/250k.csv", 5);
+    	fileReader.readPeopleFromFile("src/main/resources/assets/500k.csv", 10000);
     	
 //    	runSampleQueries(sharedSqlDao);
     	runSampleQueries(sharedCouchbaseDao);
     	
-    	
-    	environment.jersey().register(new PersonResource(sharedSqlDao));
+    	environment.jersey().register(new PersonSqlResource(sharedSqlDao));
+    	environment.jersey().register(new PersonCouchbaseResource(sharedCouchbaseDao));
     }
 
 	private void runSampleQueries(PersonDAO sharedDao) {
