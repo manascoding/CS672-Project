@@ -168,6 +168,5 @@ public class PersonCouchbaseDAO implements PersonDAO {
 	public void setBucketName(String bucketName) {
 		this.bucketName = bucketName;
 	}
-	
-	
+
 }
