@@ -44,11 +44,13 @@ public class CS672Application extends Application<CS672Configuration> {
         sharedCouchbaseDao.initializeConnection();
         sharedCouchbaseDao.clearAndCreateDatabase();
         
+        // Load the people from the csv into the db
         PersonFileReader fileReader = new PersonFileReader(sharedSqlDao, sharedCouchbaseDao);
-    	fileReader.readPeopleFromFile("src/main/resources/assets/500k.csv", 10000);
+    	fileReader.readPeopleFromFile("src/main/resources/assets/500k.csv", 100);
     	
+    	// Run sample queries if needed
 //    	runSampleQueries(sharedSqlDao);
-    	runSampleQueries(sharedCouchbaseDao);
+//    	runSampleQueries(sharedCouchbaseDao);
     	
     	environment.jersey().register(new PersonSqlResource(sharedSqlDao));
     	environment.jersey().register(new PersonCouchbaseResource(sharedCouchbaseDao));
@@ -76,6 +78,22 @@ public class CS672Application extends Application<CS672Configuration> {
     	List<Person> evenPeople = sharedDao.peopleWithEmails(evenEmails);
     	System.out.println("Printing Out Even People");
     	evenPeople.stream().forEach(p -> {
+    		System.out.println(p.toString());
+    	});
+    	
+    	// Get all the even people by ids
+    	List<String> evenIds = allPeople.stream()
+    			.filter(p -> p.getSequenceId() % 2 == 0)
+    			.map(p -> p.getId().toString())
+    			.collect(Collectors.toList());
+    	System.out.println("Printing Out Even People Email");
+    	evenIds.stream().forEach(p -> {
+    		System.out.println(p.toString());
+    	});
+    	
+    	List<Person> evenPeopleById = sharedDao.peopleWithIds(evenIds);
+    	System.out.println("Printing Out Even People By Id");
+    	evenPeopleById.stream().forEach(p -> {
     		System.out.println(p.toString());
     	});
     	

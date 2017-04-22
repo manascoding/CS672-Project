@@ -187,8 +187,11 @@ public class PersonSqlDAO implements PersonDAO {
 	@Override
 	public List<Person> peopleWithEmails(List<String> emails) {
 		
-		if (emails == null || emails.isEmpty()) {
-			throw new IllegalArgumentException("Email list cannot be null or empty");
+		if (emails == null) {
+			throw new IllegalArgumentException("Email list cannot be null");
+		}
+		if (emails.isEmpty()) {
+			return new ArrayList<>();
 		}
 		Connection connection = null;
 		List<Person> people = null;
@@ -212,6 +215,63 @@ public class PersonSqlDAO implements PersonDAO {
 			while (iterator2.hasNext()) {
 				String email = iterator2.next();
 				statement.setString(parameterIndex, email);
+				parameterIndex++;
+			}
+			ResultSet rs = statement.executeQuery();
+			statement.setQueryTimeout(QUERY_TIMEOUT);
+			people = new ArrayList<>();
+			while (rs.next()) {				
+				Person person = this.personFromResultSet(rs);
+				people.add(person);
+			}
+
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(connection != null) {
+					connection.close();
+				}
+			} catch(SQLException e) {
+				// connection failed to close.
+				e.printStackTrace();
+			}
+		}
+		return people;
+	}
+	
+	@Override
+	public List<Person> peopleWithIds(List<String> ids) {
+		
+		if (ids == null) {
+			throw new IllegalArgumentException("Id list cannot be null");
+		}
+		
+		if (ids.isEmpty()) {
+			return new ArrayList<>();
+		}
+		Connection connection = null;
+		List<Person> people = null;
+		try {
+			// create a database connection
+			connection = DriverManager.getConnection("jdbc:sqlite:person.db");
+			
+			String query = "SELECT * FROM person WHERE id IN (";
+			Iterator<String> iterator = ids.iterator();
+			while (iterator.hasNext()) {
+				iterator.next();
+				if (iterator.hasNext()) {
+					query += "?, ";
+				} else {
+					query += "?);";
+				}
+			}
+			PreparedStatement statement = connection.prepareStatement(query);
+			Iterator<String> iterator2 = ids.iterator();
+			int parameterIndex = 1;
+			while (iterator2.hasNext()) {
+				String id = iterator2.next();
+				statement.setString(parameterIndex, id);
 				parameterIndex++;
 			}
 			ResultSet rs = statement.executeQuery();

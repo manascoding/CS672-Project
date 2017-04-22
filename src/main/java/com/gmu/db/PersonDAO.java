@@ -17,6 +17,8 @@ public interface PersonDAO {
 	List<Person> peopleWithinDollarAmount(int lowerBound, int upperBound);
 
 	List<Person> peopleWithEmails(List<String> emails);
+	
+	List<Person> peopleWithIds(List<String> ids);
 
 	List<Person> allPeople();
 

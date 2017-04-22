@@ -42,6 +42,12 @@ public abstract class PersonResource {
     	return personDAO.peopleWithEmails(emails);
     }
     
+    @POST
+    @Path("/searchIds")
+    public List<Person> peopleWithIds(List<String> ids) {
+    	return personDAO.peopleWithIds(ids);
+    }
+    
     @GET
     @Path("/searchAge")
     public List<Person> peopleWithinAge(

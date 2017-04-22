@@ -36,7 +36,11 @@ public class PersonCouchbaseDAO implements PersonDAO {
 	}
 	
 	private String key(Person person) {
-		return "person::" + person.getId().toString();
+		return this.key(person.getId().toString());
+	}
+	
+	private String key(String key) {
+		return "person::" + key;
 	}
 	
 	private JsonObject jsonObjectFromPerson(Person person) {
@@ -86,7 +90,7 @@ public class PersonCouchbaseDAO implements PersonDAO {
 		int counter = 0;
         for (ViewRow row : result) {
         	counter ++;
-            bucket.remove(row.id());
+            this.bucket.remove(row.id());
         }
         System.out.println(counter);
 	}
@@ -99,7 +103,7 @@ public class PersonCouchbaseDAO implements PersonDAO {
 				.endKey(upperBound));
 		List<Person> people = new ArrayList<>();
         for (ViewRow row : result) {
-            JsonDocument document = bucket.get(row.value().toString());
+            JsonDocument document = this.bucket.get(row.value().toString());
             if (document != null) {
 				 Person person = this.personFromJsonObject(document.content());
 				 if (person != null) {
@@ -116,7 +120,7 @@ public class PersonCouchbaseDAO implements PersonDAO {
 		ViewResult result = this.bucket.query(ViewQuery.from(ALL_DOCS, "all_docs"));
 		List<Person> people = new ArrayList<>();
         for (ViewRow row : result) {
-            JsonDocument document = bucket.get(row.value().toString());
+            JsonDocument document = this.bucket.get(row.value().toString());
             if (document != null) {
 				 Person person = this.personFromJsonObject(document.content());
 				 if (person != null) {
@@ -135,7 +139,22 @@ public class PersonCouchbaseDAO implements PersonDAO {
 		ViewResult result = this.bucket.query(ViewQuery.from(ALL_DOCS, "by_email").keys(keys));
 		List<Person> people = new ArrayList<>();
         for (ViewRow row : result) {
-            JsonDocument document = bucket.get(row.value().toString());
+            JsonDocument document = this.bucket.get(row.value().toString());
+            if (document != null) {
+				 Person person = this.personFromJsonObject(document.content());
+				 if (person != null) {
+					 people.add(person);
+				 }
+			}
+        }
+		return people;
+	}
+	
+	@Override
+	public List<Person> peopleWithIds(List<String> ids) {
+		List<Person> people = new ArrayList<>();
+        for (String id : ids) {
+            JsonDocument document = this.bucket.get(this.key(id));
             if (document != null) {
 				 Person person = this.personFromJsonObject(document.content());
 				 if (person != null) {
@@ -151,7 +170,7 @@ public class PersonCouchbaseDAO implements PersonDAO {
 		List<Person> people = new ArrayList<>();
 		ViewResult result = this.bucket.query(ViewQuery.from(ALL_DOCS, "all_docs"));
         for (ViewRow row : result) {
-        	JsonDocument document = bucket.get(row.value().toString());
+        	JsonDocument document = this.bucket.get(row.value().toString());
             if (document != null) {
 				 Person person = this.personFromJsonObject(document.content());
 				 if (person != null) {
