@@ -21,10 +21,11 @@ public class PersonFileReader {
 	}
 	
 	public void readPeopleFromFile(String fileName) {
-		this.readPeopleFromFile(fileName, Integer.MAX_VALUE);
+		this.readPeopleFromFile(fileName, Integer.MAX_VALUE, 0);
 	}
 	
-	public void readPeopleFromFile(String fileName, int count) {
+	public void readPeopleFromFile(String fileName, int count, int skip) {
+		
 		try {
 			System.out.println("Working Directory = " +
 				      System.getProperty("user.dir"));
@@ -37,43 +38,47 @@ public class PersonFileReader {
 					if (counter >= count) {
 						break;
 					}
-					String id = record.get("guid");
-				    String seq = record.get("seq");
-				    String firstName = record.get("first");
-				    String lastName = record.get("last");
-				    String age = record.get("age");
-				    String birthday = record.get("birthday");
-				    String email = record.get("email");
-				    String street = record.get("street");
-				    String city = record.get("city");
-				    String state = record.get("state");
-				    String zip = record.get("zip");
-				    String dollar = record.get("dollar");
-				    String type = record.get("pick");
-				    
-				    Person person = new Person();
-				    person.setId(UUID.fromString(id));
-				    person.setSequenceId(Integer.parseInt(seq));
-				    person.setFirstName(firstName);
-				    person.setLastName(lastName);
-				    person.setAge(Integer.parseInt(age));
-				    person.setBirthday(birthday);
-				    person.setEmail(email);
-				    person.setStreet(street);
-				    person.setCity(city);
-				    person.setState(state);
-				    person.setZip(zip);
-				    // Decided to use this field as a number so removing all the unnecessary parts	
-				    person.setDollar(
-				    		(int)Math.round(Double.parseDouble(dollar.replaceAll("\\$", "").replaceAll(",", "")))); 
-				    person.setType(type);
-				    
-				    System.out.println(person.toString());
-				    // Insert the person in the database
-				    this.personSqlDAO.insertPerson(person);
-				    this.personCouchbaseDAO.insertPerson(person);
-				    
-				    counter++;
+					if (skip > 0) {
+						skip--;
+					} else {
+						String id = record.get("guid");
+					    String seq = record.get("seq");
+					    String firstName = record.get("first");
+					    String lastName = record.get("last");
+					    String age = record.get("age");
+					    String birthday = record.get("birthday");
+					    String email = record.get("email");
+					    String street = record.get("street");
+					    String city = record.get("city");
+					    String state = record.get("state");
+					    String zip = record.get("zip");
+					    String dollar = record.get("dollar");
+					    String type = record.get("pick");
+					    
+					    Person person = new Person();
+					    person.setId(UUID.fromString(id));
+					    person.setSequenceId(Integer.parseInt(seq));
+					    person.setFirstName(firstName);
+					    person.setLastName(lastName);
+					    person.setAge(Integer.parseInt(age));
+					    person.setBirthday(birthday);
+					    person.setEmail(email);
+					    person.setStreet(street);
+					    person.setCity(city);
+					    person.setState(state);
+					    person.setZip(zip);
+					    // Decided to use this field as a number so removing all the unnecessary parts	
+					    person.setDollar(
+					    		(int)Math.round(Double.parseDouble(dollar.replaceAll("\\$", "").replaceAll(",", "")))); 
+					    person.setType(type);
+					    
+					    System.out.println(person.toString());
+					    // Insert the person in the database
+					    this.personSqlDAO.insertPerson(person);
+					    this.personCouchbaseDAO.insertPerson(person);
+					    
+					    counter++;
+					}
 				}
 			}
 			System.out.println("Added: " + counter + " records into DB.");

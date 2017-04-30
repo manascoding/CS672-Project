@@ -39,6 +39,7 @@ public class CS672Application extends Application<CS672Configuration> {
     	PersonSqlDAO sharedSqlDao = new PersonSqlDAO();
     	sharedSqlDao.initializeConnection();
         sharedSqlDao.clearAndCreateDatabase();
+//    	sharedSqlDao.createEmailIndex(); // Should the email index be created
         
         PersonCouchbaseDAO sharedCouchbaseDao = new PersonCouchbaseDAO("default");
         sharedCouchbaseDao.initializeConnection();
@@ -46,7 +47,7 @@ public class CS672Application extends Application<CS672Configuration> {
         
         // Load the people from the csv into the db
         PersonFileReader fileReader = new PersonFileReader(sharedSqlDao, sharedCouchbaseDao);
-    	fileReader.readPeopleFromFile("src/main/resources/assets/500k.csv", 100);
+    	fileReader.readPeopleFromFile("src/main/resources/assets/100k.csv");
     	
     	// Run sample queries if needed
 //    	runSampleQueries(sharedSqlDao);

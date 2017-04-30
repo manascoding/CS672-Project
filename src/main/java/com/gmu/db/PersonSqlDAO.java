@@ -27,6 +27,29 @@ public class PersonSqlDAO implements PersonDAO {
 			e.printStackTrace();
 		}
 	}
+	
+	public void createEmailIndex() {
+		Connection connection = null;
+		try {
+			// create a database connection
+			connection = DriverManager.getConnection("jdbc:sqlite:person.db");
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(QUERY_TIMEOUT);
+			statement.executeUpdate("CREATE INDEX IF NOT EXISTS email_index ON person (email);");
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(connection != null) {
+					connection.close();
+				}
+			} catch(SQLException e) {
+				// connection failed to close.
+				e.printStackTrace();
+			}
+		} 
+	}
 
 	@Override
 	public void clearAndCreateDatabase() {
@@ -59,7 +82,6 @@ public class PersonSqlDAO implements PersonDAO {
 
 			// Create indexes
 			statement.executeUpdate("CREATE INDEX IF NOT EXISTS age_index ON person (age);");
-			statement.executeUpdate("CREATE INDEX IF NOT EXISTS email_index ON person (email);");
 
 		} catch(SQLException e) {
 			e.printStackTrace();
