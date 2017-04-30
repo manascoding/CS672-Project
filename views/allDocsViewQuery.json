@@ -1,0 +1,1 @@
+function (doc, meta) {  emit(meta.id, meta.id);}
